@@ -1,0 +1,116 @@
+/* frontend/src/App.css */
+html, body {
+overscroll-behavior: none;
+  overflow-y: hidden;
+
+}
+
+
+/* ensure the colored band has consistent visual height */
+.footer-band {
+  display: block;
+}
+
+/* inner container minimum height for stable spacing */
+.footer-inner {
+  min-height: 160px;
+  align-items: center;
+}
+
+/* bigger on larger screens to match reference dimensions */
+@media (min-width: 1024px) {
+  .footer-inner {
+    min-height: 200px;
+  }
+}
+
+
+/* slightly larger bottom strip height for better balance */
+.footer-bottom {
+  padding-top: 1.25rem; /* 20px */
+  padding-bottom: 1.25rem;
+}
+
+/* subtle spacing tune for icons */
+.footer-band a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+*/
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40min;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #ffffff;
+}
+
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+/* remove tiny white pixel at bottom on some browsers */
+html {
+  overflow-y: hidden;
+}
+
+#root {
+ min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
+  position: relative;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
