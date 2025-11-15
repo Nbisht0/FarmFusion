@@ -4,7 +4,11 @@ import axios from "axios"; // ✅ added axios import
 // ✅ added registerFarmer function
 const registerFarmer = async (farmerData) => {
   try {
-    const response = await axios.post("http://localhost:5000/farmers/register", farmerData);
+    const response = await axios.post("http://localhost:8080/api/users/register", {
+      ...farmerData,
+      role: "FARMER"
+    });
+
     return response.data;
   } catch (error) {
     console.error("Error registering farmer:", error);

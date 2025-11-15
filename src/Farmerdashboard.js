@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+
 import {
   LineChart,
   Line,
@@ -17,10 +18,11 @@ import WheatImg from './assets/organicwheat.jpg';
 import SpinachImg from './assets/organicspinach.jpg';
 
 function FarmerDashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [activeTab, setActiveTab] = useState("Profile");
-  const [deleteIndex, setDeleteIndex] = useState(null);
+const navigate = useNavigate();
+const location = useLocation();
+const user = location.state?.user || JSON.parse(localStorage.getItem("farmfusion_user"));
+const [activeTab, setActiveTab] = useState("Profile");
+const [deleteIndex, setDeleteIndex] = useState(null);
 
   const farmer = location.state?.farmer || {
     name: "Ramesh Kumar",
@@ -106,7 +108,8 @@ function FarmerDashboard() {
       <img src={LeafImage} alt="Leaf Pattern" className="absolute top-1/2 right-1/3 w-40 h-40 opacity-10 pointer-events-none rotate-6" />
 
       <h1 className="text-4xl font-bold text-green-700 mb-6 text-center">
-        Welcome, {farmer.name}!
+      <h1>Hello, {user?.name || "Guest"}!</h1>
+
       </h1>
 
       <div className="bg-white/30 backdrop-blur-lg p-8 rounded-xl shadow-md w-full max-w-4xl flex flex-col items-center">

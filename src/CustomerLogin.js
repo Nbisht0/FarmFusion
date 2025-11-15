@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+
 
 function CustomerLogin() {
   const [email, setEmail] = useState("");
@@ -7,14 +9,27 @@ function CustomerLogin() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log("Customer Login:", { email, password });
-    alert("Logged in as Customer!");
-    // For now, dummy customer data
-    const customerData = { name: email.split("@")[0], email, password };
-    navigate("/customer-dashboard", { state: { customer: customerData } });
-  };
+
+     const handleLogin = async (e) => {
+       e.preventDefault();
+       try {
+         const res = await axios.post("http://localhost:8080/api/users/login", {
+           email,
+           password,
+         });
+
+         if (res.data.success) {
+           const user = res.data.user;
+           alert(`Welcome, ${user.name}!`);
+           localStorage.setItem("farmfusion_user", JSON.stringify(user));
+           navigate("/customer-dashboard", { state: { user } });
+         } else {
+           alert(res.data.message);
+         }
+       } catch (err) {
+         alert("Login failed: " + err.message);
+       }
+     };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">

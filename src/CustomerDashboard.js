@@ -1,9 +1,9 @@
 // CustomerDashboard.js
 import React, { useState , useEffect } from "react";
-
-
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
 import { FaShoppingCart, FaHeart, FaUser, FaSignOutAlt, FaTrash } from "react-icons/fa";
+import axios from "axios";
+
 
 import LeafTopRight from "./assets/RL3-removebg-preview.png";
 import LeafBottomLeft from "./assets/img.png";
@@ -41,6 +41,8 @@ import RiceImg from "./assets/rice.jpg";
 import PotatoImg from "./assets/potatoes.jpg";
 
 function CustomerDashboard() {
+const location = useLocation();
+const user = location.state?.user || JSON.parse(localStorage.getItem("farmfusion_user"));
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -51,6 +53,15 @@ function CustomerDashboard() {
   const [showWishlist, setShowWishlist] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
+  // ✅ This state will hold editable profile data
+  const [profileData, setProfileData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    city: user?.city || "",
+    state: user?.state || "",
+  });
+
 
   const [backendProducts, setBackendProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,14 +72,25 @@ useEffect(() => {
   fetch("http://localhost:8080/api/products")
     .then((res) => res.json())
     .then((data) => {
-      setBackendProducts(data);
-      setLoading(false);  // stop loading when data is fetched
+      console.log("Fetched products:", data); // 🧩 debug check
+
+      // ✅ Fix: ensure it's always an array
+      if (Array.isArray(data)) {
+        setBackendProducts(data);
+      } else if (Array.isArray(data.products)) {
+        setBackendProducts(data.products);
+      } else {
+        setBackendProducts([]); // fallback
+      }
+
+      setLoading(false);
     })
     .catch((err) => {
       console.error("Failed to fetch products:", err);
-      setLoading(false);  // stop loading even if fetch fails
+      setLoading(false);
     });
 }, []);
+
 
   // Product data (id + numeric price)
   const products = [
@@ -181,13 +203,14 @@ useEffect(() => {
   const inWishlist = (productId) => wishlist.some((p) => p.id === productId);
 
   return (
-    <div className="relative min-h-screen overflow-hidden font-sans">
+    <div className="relative min-h-screen overflow-y-auto font-sans scroll-smooth">
+    <h1>Hello, {user?.name || "Guest"}!</h1>
       {/* Background */}
       <div
-        className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
+        className="fixed top-0 left-0 w-full h-full bg-cover bg-center z-0 "
         style={{ backgroundImage: `url(${BgImage})` }}
       ></div>
-      <div className="absolute top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm"></div>
+      <div className="fixed top-0 left-0 w-full h-full bg-black/40 backdrop-blur-sm z-0"></div>
 
       {/* Leaves */}
       <img src={LeafTopRight} alt="Top Right Leaf" className="absolute top-0 right-0 w-44 h-auto opacity-90 pointer-events-none rotate-[15deg] z-10" />
@@ -202,7 +225,7 @@ useEffect(() => {
       </div>
 
      {/* Product Grid */}
-     <div className="relative z-20 mt-16 px-10 pb-24">
+     <div className="relative z-20 mt-16 px-10 pb-24 overflow-y-auto max-h-[80vh] scrollbar-thin scrollbar-thumb-green-300">
        <div className="grid grid-cols-5 gap-8">
          {loading ? (
            <p className="text-white text-center col-span-5 text-xl font-semibold">
@@ -272,47 +295,159 @@ useEffect(() => {
         ☰ Menu
       </button>
 
-      {/* Profile Overlay */}
-      {showProfile && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl p-10 w-2/3 max-w-2xl relative shadow-2xl">
-            <button className="absolute top-5 right-5 text-red-500 text-2xl font-bold" onClick={() => setShowProfile(false)}>✖</button>
-            <h2 className="text-3xl font-bold mb-6 text-green-700 text-center">My Profile</h2>
-            <div className="flex flex-col md:flex-row items-center gap-10">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-40 h-40 bg-green-100 rounded-full flex items-center justify-center overflow-hidden border-4 border-green-300">
-                  {profilePic ? (
-                    <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-green-500 text-xl font-semibold">Upload</span>
-                  )}
-                </div>
-                <input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm text-green-700" />
-              </div>
+{/* Profile Overlay */}
+{showProfile && (
+  <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
+    <div className="bg-white rounded-3xl p-10 w-2/3 max-w-2xl relative shadow-2xl">
+      <button
+        className="absolute top-5 right-5 text-red-500 text-2xl font-bold"
+        onClick={() => setShowProfile(false)}
+      >
+        ✖
+      </button>
+      <h2 className="text-3xl font-bold mb-6 text-green-700 text-center">
+        My Profile
+      </h2>
 
-              <div className="flex-1 flex flex-col gap-4">
-                <div>
-                  <label className="block text-green-700 font-semibold mb-1">Name:</label>
-                  <input type="text" defaultValue="John Doe" className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300" />
-                </div>
-                <div>
-                  <label className="block text-green-700 font-semibold mb-1">Email:</label>
-                  <input type="email" defaultValue="johndoe@example.com" className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300" />
-                </div>
-                <div>
-                  <label className="block text-green-700 font-semibold mb-1">Phone:</label>
-                  <input type="text" defaultValue="+91 12345 67890" className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300" />
-                </div>
-                <div>
-                  <label className="block text-green-700 font-semibold mb-1">Address:</label>
-                  <input type="text" defaultValue="123 Green Street, FarmVille, India" className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300" />
-                </div>
-                <button className="mt-4 bg-green-700 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-800 transition">Save Changes</button>
-              </div>
-            </div>
+      <div className="flex flex-col md:flex-row items-center gap-10">
+        {/* Profile Picture */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-40 h-40 bg-green-100 rounded-full flex items-center justify-center overflow-hidden border-4 border-green-300">
+            {profilePic ? (
+              <img
+                src={profilePic}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-green-500 text-xl font-semibold">
+                Upload
+              </span>
+            )}
           </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="text-sm text-green-700"
+          />
         </div>
-      )}
+
+        {/* Editable Profile Info */}
+        <div className="flex-1 flex flex-col gap-4">
+          <div>
+            <label className="block text-green-700 font-semibold mb-1">
+              Name:
+            </label>
+            <input
+              type="text"
+              value={profileData.name}
+              onChange={(e) =>
+                setProfileData({ ...profileData, name: e.target.value })
+              }
+              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-green-700 font-semibold mb-1">
+              Email:
+            </label>
+            <input
+              type="email"
+              value={profileData.email}
+              onChange={(e) =>
+                setProfileData({ ...profileData, email: e.target.value })
+              }
+              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+
+          <div>
+            <label className="block text-green-700 font-semibold mb-1">
+              Phone:
+            </label>
+            <input
+              type="text"
+              value={profileData.phone}
+              onChange={(e) =>
+                setProfileData({ ...profileData, phone: e.target.value })
+              }
+              className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+            />
+          </div>
+
+         <div className="flex gap-3">
+           <div className="flex-1">
+             <label className="block text-green-700 font-semibold mb-1">
+               City:
+             </label>
+             <input
+               type="text"
+               value={profileData.city}
+               onChange={(e) => setProfileData({ ...profileData, city: e.target.value })}
+               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+             />
+           </div>
+           <div className="flex-1">
+             <label className="block text-green-700 font-semibold mb-1">
+               State:
+             </label>
+             <input
+               type="text"
+               value={profileData.state}
+               onChange={(e) => setProfileData({ ...profileData, state: e.target.value })}
+               className="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+             />
+           </div>
+         </div>
+
+
+          {/* Save Changes Button */}
+          <button
+            className="mt-4 bg-green-700 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-800 transition"
+            onClick={async () => {
+              try {
+                // 1️⃣ Get the logged-in user info from localStorage
+                const savedUser = JSON.parse(localStorage.getItem("farmfusion_user"));
+
+                if (!savedUser || !savedUser.id) {
+                  alert("No logged-in user found.");
+                  return;
+                }
+
+                // 2️⃣ Send updated data to backend
+                const res = await axios.put(
+                  `http://localhost:8080/api/users/update/${savedUser.id}`,
+                  {
+                    ...profileData,                     // the edited fields
+                    role: "customer",                   // keep the same role
+                    password: savedUser.password || "", // preserve old password
+                  }
+                );
+
+                // 3️⃣ Handle response
+                if (res.data.success) {
+                  alert("✅ Profile updated successfully!");
+                  localStorage.setItem("farmfusion_user", JSON.stringify(res.data.user));
+                  setProfileData(res.data.user); // update state so changes appear instantly
+                } else {
+                  alert("Update failed: " + (res.data.message || "Unknown error"));
+                }
+              } catch (err) {
+                alert("Error updating profile: " + err.message);
+                console.error(err);
+              }
+            }}
+          >
+            Save Changes
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* Cart Overlay */}
       {showCart && (

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function CustomerRegister() {
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     age: "",
     gender: "",
     phone: "",
@@ -18,15 +20,36 @@ function CustomerRegister() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // Fixed: single, well-formed handleSubmit
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Customer Registered:", formData);
-    alert("Customer registered successfully!");
-    navigate("/customer-dashboard", { state: { customer: formData } });
+
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: "customer"
+      };
+
+      const res = await axios.post("http://localhost:8080/api/users/register", payload);
+
+      if (res.data.success) {
+        const user = res.data.user || payload; // fallback if backend doesn't return user
+        localStorage.setItem("farmfusion_user", JSON.stringify(user));
+        alert("Customer registered successfully!");
+        navigate("/customer-dashboard", { state: { user } });
+      } else {
+        alert(res.data.message || "Registration failed!");
+      }
+    } catch (err) {
+      alert("Error registering: " + (err.response?.data?.message || err.message));
+    }
   };
 
   return (
@@ -45,6 +68,7 @@ function CustomerRegister() {
           <input type="tel" name="phone" placeholder="Phone Number" className="border p-2 rounded" value={formData.phone} onChange={handleChange} required />
           <input type="text" name="city" placeholder="City" className="border p-2 rounded" value={formData.city} onChange={handleChange} required />
           <input type="text" name="state" placeholder="State" className="border p-2 rounded" value={formData.state} onChange={handleChange} required />
+          <input type="email" name="email" placeholder="Email" className="border p-2 rounded" value={formData.email} onChange={handleChange} required />
           <input type="password" name="password" placeholder="Password" className="border p-2 rounded" value={formData.password} onChange={handleChange} required />
           <input type="password" name="confirmPassword" placeholder="Confirm Password" className="border p-2 rounded" value={formData.confirmPassword} onChange={handleChange} required />
 

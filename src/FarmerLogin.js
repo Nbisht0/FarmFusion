@@ -1,24 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 
 function FarmerLogin() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+    const handleLogin = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await axios.post("http://localhost:8080/api/users/login", {
+          email: username, // or email for customer
+          password : password,
+        });
+        if (res.data.success) {
+          const user = res.data.user;
+          alert(`Welcome, ${user.name}!`);
+          localStorage.setItem("farmfusion_user", JSON.stringify(user));
+          navigate(user.role === "FARMER" ? "/farmer-dashboard" : "/customer-dashboard", { state: { user } });
+        } else {
+          alert(res.data.message);
+        }
+      } catch (err) {
+        alert("Login failed: " + err.message);
+      }
+    };
 
-    //TODO: Replace with actual backend API call
-    console.log("Logging in:", { username, password });
-
-    if (username && password) {
-      alert("Login successful!");
-      navigate("/farmer-dashboard"); // ✅ Navigate to dashboard
-    } else {
-      alert("Please fill in all fields.");
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-green-100">
