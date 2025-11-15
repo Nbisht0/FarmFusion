@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "recharts": "^3.2.1",
+    "proxy": "http://localhost:8080"
+
+  }
+}
+
