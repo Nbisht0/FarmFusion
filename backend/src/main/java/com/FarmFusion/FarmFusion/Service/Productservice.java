@@ -3,6 +3,7 @@ package com.FarmFusion.FarmFusion.Service;
 import com.FarmFusion.FarmFusion.entity.Products;
 import com.FarmFusion.FarmFusion.exception.ResourceNotFoundException;
 import com.FarmFusion.FarmFusion.repository.ProductRepository;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,4 +45,11 @@ public class Productservice {
         repo.delete(existing);
     }
 
+    public List<Products> getAllProducts() {
+        return repo.findAll();
+    }
+
+    public Products addProduct(@Valid Products product) {
+        return repo.save(product);
+    }
 }

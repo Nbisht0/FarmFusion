@@ -4,15 +4,14 @@ import com.FarmFusion.FarmFusion.entity.Products;
 import com.FarmFusion.FarmFusion.Service.Productservice;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/products")
+@CrossOrigin(origins = "*")
 public class ProductController {
 
     private final Productservice service;
@@ -21,56 +20,52 @@ public class ProductController {
         this.service = service;
     }
 
+    // Add Product (POST)
     @PostMapping
-    public ResponseEntity<Products> create(@Valid @RequestBody Products product) {
-        return ResponseEntity.ok(service.create(product));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Products>> getAll() {
-        return ResponseEntity.ok(service.getAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Products> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Products> update(@PathVariable Long id,
-                                          @Valid @RequestBody Products product) {
-        return ResponseEntity.ok(service.update(id, product));
-    }
-
-    @PostMapping("/add")
-    public ResponseEntity<?> addProduct(
-            @RequestParam String name,
-            @RequestParam Double price,
-            @RequestParam("image") MultipartFile imageFile
-    ) {
+    public ResponseEntity<Products> addProduct(@Valid @RequestBody Products product) {
         try {
-            Collections ObjectUtils;
-            Map uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), ObjectUtils.emptyMap());
-            String imageUrl = uploadResult.get("secure_url").toString();
-
-            Products product = new Products();
-            product.setName(name);
-            product.setPrice(price);
-            product.setImageUrl(imageUrl);
-
-            ProductRepository.save(product);
-
-            return ResponseEntity.ok(product);
-
+            Products savedProduct = service.addProduct(product);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+    // Get All Products (GET)
+    @GetMapping
+    public ResponseEntity<List<Products>> getAllProducts() {
+        return ResponseEntity.ok(service.getAllProducts());
+    }
 
+    // Get Product by ID (GET)
+    @GetMapping("/{id}")
+    public ResponseEntity<Products> getProductById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(service.getById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Update Product (PUT)
+    @PutMapping("/{id}")
+    public ResponseEntity<Products> updateProduct(@PathVariable Long id, @Valid @RequestBody Products updatedProduct) {
+        try {
+            Products product = service.update(id, updatedProduct);
+            return ResponseEntity.ok(product);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Delete Product (DELETE)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        try {
+            service.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 }
