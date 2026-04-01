@@ -17,16 +17,22 @@ public class Orders {
 
     private Double totalAmount;
 
-    private String status = "PENDING"; // default value
+    @Column(nullable = false)
+    private String status = "PENDING"; // PENDING → CONFIRMED → SHIPPED → DELIVERED → CANCELLED
 
-    // Many orders belong to one User (FK = user_id)
+    // Many orders belong to one User
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false) // ✅ FIXED
+    @JoinColumn(name = "user_id", nullable = false)
     private User customer;
 
     // One order has many items
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItems> orderItems = new ArrayList<>();
+
+    // Link to delivery address
+    @ManyToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address deliveryAddress;
 
     // Auto-set orderDate before saving
     @PrePersist
@@ -42,46 +48,27 @@ public class Orders {
     }
 
     // --- Getters & Setters ---
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
+    public LocalDateTime getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
 
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
+    public Double getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
 
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public User getCustomer() {
-        return customer;
-    }
-    public void setCustomer(User customer) {
-        this.customer = customer;
-    }
+    public User getCustomer() { return customer; }
+    public void setCustomer(User customer) { this.customer = customer; }
 
-    public List<OrderItems> getOrderItems() {
-        return orderItems;
-    }
+    public List<OrderItems> getOrderItems() { return orderItems; }
     public void setOrderItems(List<OrderItems> orderItems) {
         this.orderItems = orderItems;
-        calculateTotalAmount(); // auto update totalAmount
+        calculateTotalAmount();
     }
+
+    public Address getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(Address deliveryAddress) { this.deliveryAddress = deliveryAddress; }
 }

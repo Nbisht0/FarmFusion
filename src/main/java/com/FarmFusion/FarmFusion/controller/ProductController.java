@@ -1,43 +1,62 @@
 package com.FarmFusion.FarmFusion.controller;
 
 import com.FarmFusion.FarmFusion.entity.Products;
-import com.FarmFusion.FarmFusion.Service.Productservice;
-import jakarta.validation.Valid;
+import com.FarmFusion.FarmFusion.Service.ProductService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ProductController {
 
-    private final Productservice service;
+    private final ProductService service;
 
-    public ProductController(Productservice service) {
+    public ProductController(ProductService service) {
         this.service = service;
     }
 
-    // Add Product (POST)
-    @PostMapping
-    public ResponseEntity<Products> addProduct(@Valid @RequestBody Products product) {
+    // ---------------- ADD PRODUCT WITH IMAGE ----------------
+    @PostMapping(
+            value = "/addWithImage",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<?> addProduct(
+            @RequestParam("name") String name,
+            @RequestParam("quantity") int quantity,
+            @RequestParam("price") double price,
+            @RequestParam("imageFile") MultipartFile imageFile
+    ) {
         try {
-            Products savedProduct = service.addProduct(product);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
+            Products product = new Products();
+            product.setName(name);
+            product.setQuantity(quantity);
+            product.setPrice(price);
+
+            Products saved = service.addProductWithImage(product, imageFile);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Image upload failed: " + e.getMessage());
         }
     }
 
-    // Get All Products (GET)
+
+    // ---------------- GET ALL PRODUCTS ----------------
     @GetMapping
     public ResponseEntity<List<Products>> getAllProducts() {
         return ResponseEntity.ok(service.getAllProducts());
     }
 
-    // Get Product by ID (GET)
+    // ---------------- GET BY ID ----------------
     @GetMapping("/{id}")
     public ResponseEntity<Products> getProductById(@PathVariable Long id) {
         try {
@@ -47,24 +66,26 @@ public class ProductController {
         }
     }
 
-    // Update Product (PUT)
+    // ---------------- UPDATE PRODUCT ----------------
     @PutMapping("/{id}")
-    public ResponseEntity<Products> updateProduct(@PathVariable Long id, @Valid @RequestBody Products updatedProduct) {
+    public ResponseEntity<Products> updateProduct(
+            @PathVariable Long id,
+            @RequestBody Products updatedProduct
+    ) {
         try {
-            Products product = service.update(id, updatedProduct);
-            return ResponseEntity.ok(product);
+            return ResponseEntity.ok(service.update(id, updatedProduct));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    // Delete Product (DELETE)
+    // ---------------- DELETE PRODUCT ----------------
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         try {
             service.delete(id);
             return ResponseEntity.noContent().build();
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }

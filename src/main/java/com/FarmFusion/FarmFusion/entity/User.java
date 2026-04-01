@@ -1,34 +1,52 @@
 package com.FarmFusion.FarmFusion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // COMMON FIELDS
+    @Column(nullable = false)
     private String name;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
-    private String role;
+
+    @Column(nullable = false)
+    private String role;  // FARMER or CUSTOMER
+
+    // CUSTOMER FIELDS
+    private Integer age;
+    private String gender;
+
+    @Column(unique = true)
     private String phone;
+
     private String city;
     private String state;
 
+    // FARMER FIELDS
+    private String address;
+
+    @Column(unique = true)
+    private String aadhaar;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String profileImage; // Base64 image
 
     public User() {}
 
-    public User(String name, String email, String password, String role) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-
-    // Getters and Setters
+    // ---- GETTERS & SETTERS ----
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -44,28 +62,27 @@ public class User {
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public String getCity() {
-        return city;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
 
-    public String getState() {
-        return state;
-    }
+    public String getState() { return state; }
+    public void setState(String state) { this.state = state; }
 
-    public void setState(String state) {
-        this.state = state;
-    }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
+    public String getAadhaar() { return aadhaar; }
+    public void setAadhaar(String aadhaar) { this.aadhaar = aadhaar; }
+
+    public String getProfileImage() { return profileImage; }
+    public void setProfileImage(String profileImage) { this.profileImage = profileImage; }
 }

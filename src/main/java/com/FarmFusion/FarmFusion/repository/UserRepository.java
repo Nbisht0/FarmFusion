@@ -1,15 +1,13 @@
-package com.FarmFusion.FarmFusion.repository; //package name of this repository
+package com.FarmFusion.FarmFusion.repository;
 
-import com.FarmFusion.FarmFusion.entity.User; //so we can connect database users
-import org.springframework.data.jpa.repository.JpaRepository; //Jparepository : a spring data jpa interface that gives you CRUD operations
+import com.FarmFusion.FarmFusion.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long>{
-    Optional<User> findByEmail(String email); //Jparepository<user , long > means
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    Optional<User> findByEmail(String email);
+
     Optional<User> findByName(String name);
-    //user : the entity it manages // long : type of ID
-
-
-
 }
