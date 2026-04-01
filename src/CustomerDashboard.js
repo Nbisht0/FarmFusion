@@ -69,7 +69,7 @@ const user = location.state?.user || JSON.parse(localStorage.getItem("farmfusion
 
 
 useEffect(() => {
-  fetch("http://localhost:8080/api/products")
+  fetch("http://localhost:8080/products")
     .then((res) => res.json())
     .then((data) => {
       console.log("Fetched products:", data); // 🧩 debug check
@@ -171,7 +171,8 @@ useEffect(() => {
     setWishlist((prev) => {
       const exists = prev.find((p) => p.id === productId);
       if (exists) return prev.filter((p) => p.id !== productId);
-      return [...prev, { id: product.id, name: product.name, image: product.image, price: product.price }];
+      return [...prev, { id: product.id, name: product.name, image: product.imageUrl || product.image
+, price: product.price }];
     });
   };
 
@@ -253,7 +254,7 @@ useEffect(() => {
                <FaHeart size={20} />
              </button>
 
-             <img src={product.image} alt={product.name} className="w-36 h-36 object-cover rounded-xl mb-4 shadow-sm" />
+             <img src={product.imageUrl || product.image} alt={product.name} className="w-36 h-36 object-cover rounded-xl mb-4 shadow-sm" />
              <h2 className="text-lg font-semibold text-green-900 text-center">{product.name}</h2>
              <p className="text-green-700 font-medium text-center mt-1">₹{product.price}</p>
            </div>
@@ -416,24 +417,21 @@ useEffect(() => {
                   return;
                 }
 
-                // 2️⃣ Send updated data to backend
                 const res = await axios.put(
                   `http://localhost:8080/api/users/update/${savedUser.id}`,
                   {
-                    ...profileData,                     // the edited fields
-                    role: "customer",                   // keep the same role
-                    password: savedUser.password || "", // preserve old password
+                    ...profileData,
+                    role: "customer",
+                    password: savedUser.password || "",
                   }
                 );
 
-                // 3️⃣ Handle response
-                if (res.data.success) {
-                  alert("✅ Profile updated successfully!");
-                  localStorage.setItem("farmfusion_user", JSON.stringify(res.data.user));
-                  setProfileData(res.data.user); // update state so changes appear instantly
-                } else {
-                  alert("Update failed: " + (res.data.message || "Unknown error"));
-                }
+                // Backend returns full user object directly
+                alert("✅ Profile updated successfully!");
+
+                localStorage.setItem("farmfusion_user", JSON.stringify(res.data));
+                setProfileData(res.data);
+
               } catch (err) {
                 alert("Error updating profile: " + err.message);
                 console.error(err);
@@ -463,7 +461,8 @@ useEffect(() => {
                 {cart.map((item) => (
                   <div key={item.id} className="flex items-center justify-between p-4 bg-green-50 rounded-xl shadow">
                     <div className="flex items-center gap-4">
-                      <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                     <img src={item.imageUrl || item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+
                       <div>
                         <h3 className="font-semibold text-green-900">{item.name} {item.quantity > 1 && <span className="text-sm text-gray-600">× {item.quantity}</span>}</h3>
                         <p className="text-green-700">₹{(item.price * (item.quantity || 1)).toFixed(2)}</p>
@@ -513,7 +512,8 @@ useEffect(() => {
                 {wishlist.map((item) => (
                   <div key={item.id} className="flex items-center justify-between p-4 bg-pink-50 rounded-xl shadow">
                     <div className="flex items-center gap-4">
-                      <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                      <img src={item.imageUrl || item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+
                       <div>
                         <h3 className="font-semibold text-pink-900">{item.name}</h3>
                         <p className="text-pink-700">₹{item.price}</p>

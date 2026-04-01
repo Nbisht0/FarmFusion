@@ -1,55 +1,81 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
 
 function CustomerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
+const handleLogin = async (e) => {
+  e.preventDefault();
 
+  try {
+    const res = await axios.post("/api/users/login", {
+      email,
+      password,
+    });
 
-     const handleLogin = async (e) => {
-       e.preventDefault();
-       try {
-         const res = await axios.post("http://localhost:8080/api/users/login", {
-           email,
-           password,
-         });
+    const { success, user } = res.data;
 
-         if (res.data.success) {
-           const user = res.data.user;
-           alert(`Welcome, ${user.name}!`);
-           localStorage.setItem("farmfusion_user", JSON.stringify(user));
-           navigate("/customer-dashboard", { state: { user } });
-         } else {
-           alert(res.data.message);
-         }
-       } catch (err) {
-         alert("Login failed: " + err.message);
-       }
-     };
+    if (success && user) {
+      alert(`Welcome, ${user.name}!`);
+
+      localStorage.setItem("farmfusion_user", JSON.stringify(user));
+
+      navigate("/customer-dashboard", { state: { user } });
+    } else {
+      alert(res.data.message || "Login failed!");
+    }
+
+  } catch (err) {
+    alert("Login failed: " + (err.response?.data?.message || err.message));
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
       <div className="bg-white rounded-xl shadow-lg p-8 w-[400px] flex flex-col items-center">
         <h2 className="text-2xl font-bold text-green-700 mb-6">Customer Login</h2>
+
         <form className="flex flex-col gap-4 w-full" onSubmit={handleLogin}>
-          <input type="email" placeholder="Email" className="border p-2 rounded" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <input type="password" placeholder="Password" className="border p-2 rounded" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <button type="submit" className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded transition">
+          <input
+            type="email"
+            placeholder="Email"
+            className="border p-2 rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="border p-2 rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button
+            type="submit"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded transition"
+          >
             Login
           </button>
         </form>
 
-        {/* Register Button */}
-        <button onClick={() => navigate("/customer-register")} className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded mt-4 w-full transition">
+        <button
+          onClick={() => navigate("/customer-register")}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded mt-4 w-full transition"
+        >
           Register
         </button>
 
-        {/* Go to Homepage */}
-        <button onClick={() => navigate("/")} className="mt-4 text-green-700 font-semibold hover:underline">
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 text-green-700 font-semibold hover:underline"
+        >
           Go to Homepage
         </button>
       </div>
