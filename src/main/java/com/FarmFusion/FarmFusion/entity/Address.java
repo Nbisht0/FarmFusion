@@ -10,27 +10,38 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String street;
+
+    @Column(nullable = false)
     private String city;
+
+    @Column(nullable = false)
     private String state;
+
+    @Column(nullable = false, length = 10)
     private String pincode;
 
-    // Link to User
+    @Column(nullable = false)
+    private String country = "India"; // default for FarmFusion
+
+    // A user can have multiple saved addresses
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Address() {}
 
-    public Address(String street, String city, String state, String zipcode, User user) {
+    public Address(String street, String city, String state, String pincode, String country, User user) {
         this.street = street;
         this.city = city;
         this.state = state;
-        this.pincode = zipcode;
+        this.pincode = pincode;
+        this.country = country;
         this.user = user;
     }
 
-
+    // --- Getters & Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -43,8 +54,11 @@ public class Address {
     public String getState() { return state; }
     public void setState(String state) { this.state = state; }
 
-    public String getZipcode() { return pincode; }
-    public void setZipcode(String zipcode) { this.pincode = zipcode; }
+    public String getPincode() { return pincode; }
+    public void setPincode(String pincode) { this.pincode = pincode; }
+
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
