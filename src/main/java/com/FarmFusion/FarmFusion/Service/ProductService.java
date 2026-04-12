@@ -33,15 +33,13 @@ public class ProductService {
     public Products addProductWithImage(Products product, MultipartFile imageFile) throws IOException {
 
         if (imageFile != null && !imageFile.isEmpty()) {
-
             Map uploadResult = cloudinary.uploader().upload(
-                    imageFile.getInputStream(),      // FIXED
+                    imageFile.getInputStream(),
                     ObjectUtils.asMap(
                             "folder", "farmfusion/products",
                             "resource_type", "image"
                     )
             );
-
             String imageUrl = uploadResult.get("secure_url").toString();
             product.setImageUrl(imageUrl);
         }
@@ -49,42 +47,53 @@ public class ProductService {
         return repo.save(product);
     }
 
-
-    // ADD PRODUCT FOR FARMER
+    // ADD PRODUCT FOR FARMER (without image)
     public Products addProductForFarmer(Products product, Long farmerId) {
         User farmer = userRepo.findById(farmerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Farmer not found: " + farmerId));
-
         product.setAddedBy(farmer);
         return repo.save(product);
     }
 
+    // GET ALL PRODUCTS (for consumer browse)
     public List<Products> getAllProducts() {
         return repo.findAll();
     }
 
+    // GET PRODUCTS BY FARMER ID (for farmer dashboard)
+    public List<Products> getProductsByFarmerId(Long farmerId) {
+        return repo.findByAddedById(farmerId);
+    }
+
+    // GET SINGLE PRODUCT BY ID
     public Products getById(Long id) {
         return repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + id));
     }
 
+    // UPDATE PRODUCT
     public Products update(Long id, Products updatedProduct) {
         Products existing = getById(id);
-
         existing.setName(updatedProduct.getName());
         existing.setDescription(updatedProduct.getDescription());
         existing.setPrice(updatedProduct.getPrice());
         existing.setQuantity(updatedProduct.getQuantity());
         existing.setCategory(updatedProduct.getCategory());
         existing.setImageUrl(updatedProduct.getImageUrl());
-
         return repo.save(existing);
     }
 
+    // DELETE PRODUCT
     public void delete(Long id) {
         repo.deleteById(id);
     }
 
-    public void saveProduct(Products product) { repo.save(product);
+    // GET PRODUCTS BY CATEGORY
+    public List<Products> getByCategory(String category) {
+        return repo.findByCategory(category);
+    }
+
+    public void saveProduct(Products product) {
+        repo.save(product);
     }
 }

@@ -1,6 +1,7 @@
 package com.FarmFusion.FarmFusion.Service;
 
 import com.FarmFusion.FarmFusion.entity.OrderItems;
+import com.FarmFusion.FarmFusion.exception.ResourceNotFoundException;
 import com.FarmFusion.FarmFusion.repository.OrderItemsRepository;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import java.util.List;
 
 @Service
 public class OrderItemsService {
+
     private final OrderItemsRepository orderItemsRepository;
 
     public OrderItemsService(OrderItemsRepository orderItemsRepository) {
@@ -19,7 +21,12 @@ public class OrderItemsService {
     }
 
     public OrderItems getOrderItemById(Long id) {
-        return orderItemsRepository.findById(id).orElse(null);
+        return orderItemsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order item not found: " + id));
+    }
+
+    public List<OrderItems> getItemsByOrderId(Long orderId) {
+        return orderItemsRepository.findByOrderId(orderId);
     }
 
     public OrderItems saveOrderItem(OrderItems orderItem) {
@@ -29,5 +36,4 @@ public class OrderItemsService {
     public void deleteOrderItem(Long id) {
         orderItemsRepository.deleteById(id);
     }
-
 }
