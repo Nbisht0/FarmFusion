@@ -1,11 +1,29 @@
-<<<<<<< HEAD
+# ===========================
+# SPRING BOOT / MAVEN
+# ===========================
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !backend/src/main/**/target/
 !backend/src/test/**/target/
 
-### STS ###
+# ===========================
+# SENSITIVE CONFIG - NEVER PUSH
+# ===========================
+src/main/resources/application.properties
+src/main/resources/application-prod.properties
+
+# ===========================
+# INTELLIJ IDEA
+# ===========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# ===========================
+# STS (Spring Tool Suite)
+# ===========================
 .apt_generated
 .classpath
 .factorypath
@@ -14,13 +32,9 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# ===========================
+# NETBEANS
+# ===========================
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -30,30 +44,30 @@ build/
 !backend/src/main/**/build/
 !backend/src/test/**/build/
 
-### VS Code ###
+# ===========================
+# VS CODE
+# ===========================
 .vscode/
-=======
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# ===========================
+# REACT / NODE
+# ===========================
 /node_modules
 /.pnp
 .pnp.js
-
-# testing
 /coverage
-
-# production
 /build
-
-# misc
-.DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
->>>>>>> ca42f6659280201850c9129f1271c77ae66acc5c
+
+# ===========================
+# OS FILES
+# ===========================
+.DS_Store
+Thumbs.db

@@ -18,9 +18,15 @@ public class ImageUploadService {
     }
 
     public String uploadImage(MultipartFile file) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("folder", "farmfusion_products"));
-
+        // Using getInputStream() is more memory efficient than getBytes()
+        // especially for large image files
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getInputStream(),
+                ObjectUtils.asMap(
+                        "folder", "farmfusion/products",
+                        "resource_type", "image"
+                )
+        );
         return uploadResult.get("secure_url").toString();
     }
 }
