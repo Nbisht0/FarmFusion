@@ -3,7 +3,7 @@ import React, { useState , useEffect } from "react";
 import { useNavigate , useLocation } from "react-router-dom";
 import { FaShoppingCart, FaHeart, FaUser, FaSignOutAlt, FaTrash } from "react-icons/fa";
 import axios from "axios";
-
+ //test configuration for backend URL
 
 import LeafTopRight from "./assets/RL3-removebg-preview.png";
 import LeafBottomLeft from "./assets/img.png";
