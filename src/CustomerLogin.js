@@ -2,36 +2,46 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const BASE_URL = "http://localhost:8080";
+
 function CustomerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-const handleLogin = async (e) => {
-  e.preventDefault();
 
-  try {
-    const res = await axios.post("/api/users/login", {
-      email,
-      password,
-    });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-    const { success, user } = res.data;
+    try {
+      const res = await axios.post(`${BASE_URL}/api/users/login`, {
+        email,
+        password,
+      });
 
-    if (success && user) {
-      alert(`Welcome, ${user.name}!`);
+      const { success, user } = res.data;
 
-      localStorage.setItem("farmfusion_user", JSON.stringify(user));
+      if (success && user) {
+        // Check role — customer hi login kar sake yahan
+        if (user.role !== "CUSTOMER") {
+          alert("This login is for customers only!");
+          return;
+        }
 
-      navigate("/customer-dashboard", { state: { user } });
-    } else {
-      alert(res.data.message || "Login failed!");
+        localStorage.setItem("farmfusion_user", JSON.stringify(user));
+        navigate("/customer-dashboard", { state: { user } });
+
+      } else {
+        alert(res.data.message || "Login failed!");
+      }
+
+    } catch (err) {
+      alert("Login failed: " + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
     }
-
-  } catch (err) {
-    alert("Login failed: " + (err.response?.data?.message || err.message));
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-green-100">
@@ -59,9 +69,10 @@ const handleLogin = async (e) => {
 
           <button
             type="submit"
+            disabled={loading}
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded transition"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

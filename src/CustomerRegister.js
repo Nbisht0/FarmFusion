@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const BASE_URL = "http://localhost:8080";
+
 function CustomerRegister() {
   const [formData, setFormData] = useState({
     name: "",
@@ -12,6 +14,7 @@ function CustomerRegister() {
     gender: ""
   });
 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -26,22 +29,24 @@ function CustomerRegister() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const payload = {
         name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: "CUSTOMER",
-          age: formData.age,
-          gender: formData.gender,
-          phone: "",
-          city: "",
-          state: "",
-          address: null,
-          aadhaar: null
+        email: formData.email,
+        password: formData.password,
+        role: "CUSTOMER",
+        age: formData.age,
+        gender: formData.gender,
+        phone: "",
+        city: "",
+        state: "",
+        address: null,
+        aadhaar: null
       };
 
-      const res = await axios.post("/api/users/register", payload);
+      const res = await axios.post(`${BASE_URL}/api/users/register`, payload);
 
       if (res.data.success) {
         alert("Customer registered successfully!");
@@ -52,6 +57,8 @@ function CustomerRegister() {
 
     } catch (err) {
       alert("Error: " + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,16 +97,21 @@ function CustomerRegister() {
             className="border p-2 rounded" value={formData.confirmPassword}
             onChange={handleChange} required />
 
-          <button type="submit"
-            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded">
-            Register
+          <button type="submit" disabled={loading}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded transition">
+            {loading ? "Registering..." : "Register"}
           </button>
 
         </form>
 
         <button onClick={() => navigate("/customer-login")}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded mt-4 w-full">
-          Login
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded mt-4 w-full transition">
+          Already have an account? Login
+        </button>
+
+        <button onClick={() => navigate("/")}
+          className="mt-4 text-green-700 font-semibold hover:underline">
+          Go to Homepage
         </button>
 
       </div>

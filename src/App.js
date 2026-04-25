@@ -24,17 +24,6 @@ function Home() {
   const [consumerExpanded, setConsumerExpanded] = useState(false);
 
   const navigate = useNavigate();
-  useEffect(() => {
-    fetch("/api/users/test")
-      .then((res) => res.text())
-      .then((data) => {
-        console.log("Backend says:", data);
-      })
-      .catch((err) => console.error("Error calling backend:", err));
-  }, []);
-
-
-
   const farmerCartoonURL =
     "https://img.freepik.com/premium-vector/indian-farmer-orange-clothes-works-hoe-vector-illustration-white-background_223337-15464.jpg?w=996";
   const consumerCartoonURL =
