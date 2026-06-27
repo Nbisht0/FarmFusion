@@ -1,5 +1,6 @@
 package com.FarmFusion.FarmFusion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,15 +24,18 @@ public class Orders {
     // Many orders belong to one User
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"password", "aadhaar", "profileImage", "hibernateLazyInitializer", "handler"})
     private User customer;
 
     // One order has many items
+    @JsonIgnoreProperties({"order"})
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItems> orderItems = new ArrayList<>();
 
     // Link to delivery address
     @ManyToOne
     @JoinColumn(name = "address_id", nullable = false)
+    @JsonIgnoreProperties({"user", "hibernateLazyInitializer", "handler"})
     private Address deliveryAddress;
 
     // Auto-set orderDate before saving

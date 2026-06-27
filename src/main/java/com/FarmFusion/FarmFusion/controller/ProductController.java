@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"})
 public class ProductController {
 
     private final ProductService service;
@@ -59,6 +59,25 @@ public class ProductController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Product upload failed: " + e.getMessage());
+        }
+    }
+
+    // ---------------- ADD PRODUCT (JSON with imageUrl already uploaded) ----------------
+    @PostMapping("/add")
+    public ResponseEntity<?> addProductJson(@RequestBody Products product) {
+        try {
+            if (product.getAddedBy() == null || product.getAddedBy().getId() == null) {
+                return ResponseEntity.badRequest().body("Farmer ID is required");
+            }
+            User farmer = userRepository.findById(product.getAddedBy().getId())
+                    .orElseThrow(() -> new RuntimeException("Farmer not found"));
+            product.setAddedBy(farmer);
+            Products saved = service.addProduct(product);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to add product: " + e.getMessage());
         }
     }
 

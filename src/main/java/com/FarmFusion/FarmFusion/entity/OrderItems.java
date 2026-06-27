@@ -1,5 +1,7 @@
 package com.FarmFusion.FarmFusion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,13 +13,15 @@ public class OrderItems {
     private Long id;
 
     // Many items belong to one order
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
     // Many items belong to one product
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties({"addedBy", "hibernateLazyInitializer", "handler"})
     private Products product;
 
     @Column(nullable = false)

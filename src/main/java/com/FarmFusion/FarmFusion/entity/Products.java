@@ -18,6 +18,7 @@ public class Products {
     @NotBlank(message = "Name is required")
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @NotNull(message = "Price is required")
@@ -32,8 +33,9 @@ public class Products {
 
     private String category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "added_by_user_id")
+    @JsonIgnoreProperties({"password", "aadhaar", "address", "phone", "age", "gender", "profileImage", "hibernateLazyInitializer", "handler"})
     private User addedBy;
 
     public Products() {}

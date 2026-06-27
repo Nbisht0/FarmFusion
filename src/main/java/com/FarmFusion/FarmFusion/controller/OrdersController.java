@@ -1,5 +1,6 @@
 package com.FarmFusion.FarmFusion.controller;
 
+import com.FarmFusion.FarmFusion.dto.OrderRequestDTO;
 import com.FarmFusion.FarmFusion.entity.Orders;
 import com.FarmFusion.FarmFusion.Service.OrdersService;
 import org.springframework.http.HttpStatus;
@@ -19,13 +20,11 @@ public class OrdersController {
         this.ordersService = ordersService;
     }
 
-    // GET ALL ORDERS (admin use)
     @GetMapping
     public ResponseEntity<List<Orders>> getAllOrders() {
         return ResponseEntity.ok(ordersService.getAllOrders());
     }
 
-    // GET ORDER BY ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         try {
@@ -35,16 +34,23 @@ public class OrdersController {
         }
     }
 
-    // GET ALL ORDERS FOR A SPECIFIC CUSTOMER
     @GetMapping("/customer/{customerId}")
     public ResponseEntity<List<Orders>> getOrdersByCustomer(@PathVariable Long customerId) {
         return ResponseEntity.ok(ordersService.getOrdersByCustomerId(customerId));
     }
 
-    // PLACE A NEW ORDER
+    @GetMapping("/farmer/{farmerId}")
+    public ResponseEntity<List<Orders>> getOrdersByFarmer(@PathVariable Long farmerId) {
+        return ResponseEntity.ok(ordersService.getOrdersByFarmerId(farmerId));
+    }
+
+    // OLD endpoint — kept for safety, not used by checkout
     @PostMapping
     public ResponseEntity<?> addOrder(@RequestBody Orders order) {
         try {
+            if (order.getOrderItems() != null) {
+                order.getOrderItems().forEach(item -> item.setOrder(order));
+            }
             Orders saved = ordersService.saveOrder(order);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (Exception e) {
@@ -53,7 +59,18 @@ public class OrdersController {
         }
     }
 
-    // UPDATE ORDER STATUS (e.g. CONFIRMED, SHIPPED, DELIVERED)
+    // NEW endpoint — used by React checkout
+    @PostMapping("/place")
+    public ResponseEntity<?> placeOrder(@RequestBody OrderRequestDTO dto) {
+        try {
+            Orders saved = ordersService.placeOrder(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to place order: " + e.getMessage());
+        }
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {
@@ -64,7 +81,6 @@ public class OrdersController {
         }
     }
 
-    // DELETE ORDER
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
         try {

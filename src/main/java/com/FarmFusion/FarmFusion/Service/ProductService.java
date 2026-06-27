@@ -47,6 +47,11 @@ public class ProductService {
         return repo.save(product);
     }
 
+    // ADD PRODUCT (imageUrl already set, farmer already linked)
+    public Products addProduct(Products product) {
+        return repo.save(product);
+    }
+
     // ADD PRODUCT FOR FARMER (without image)
     public Products addProductForFarmer(Products product, Long farmerId) {
         User farmer = userRepo.findById(farmerId)

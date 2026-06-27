@@ -12,10 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(
-        origins = "http://localhost:3000",
-        allowCredentials = "true"
-)
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"}, allowCredentials = "true")
 public class UserController {
 
     private final UserRepository userRepository;
@@ -74,7 +71,7 @@ public class UserController {
             return ResponseEntity.badRequest().body(response(false, "User not found", null));
         }
 
-        if (!user.getPassword().equals(loginReq.getPassword())) {
+        if (!userService.checkPassword(loginReq.getPassword(), user.getPassword())) {
             return ResponseEntity.badRequest().body(response(false, "Invalid password", null));
         }
 

@@ -21,7 +21,7 @@ public class ImageUploadService {
         // Using getInputStream() is more memory efficient than getBytes()
         // especially for large image files
         Map uploadResult = cloudinary.uploader().upload(
-                file.getInputStream(),
+                file.getBytes(),
                 ObjectUtils.asMap(
                         "folder", "farmfusion/products",
                         "resource_type", "image"

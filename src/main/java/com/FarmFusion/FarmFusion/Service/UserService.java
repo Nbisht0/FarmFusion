@@ -3,6 +3,7 @@ package com.FarmFusion.FarmFusion.Service;
 import com.FarmFusion.FarmFusion.entity.User;
 import com.FarmFusion.FarmFusion.exception.ResourceNotFoundException;
 import com.FarmFusion.FarmFusion.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // GET ALL USERS
@@ -27,9 +30,15 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     }
 
-    // SAVE NEW USER
+    // SAVE NEW USER — encrypts password before storing
     public User saveUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    // VERIFY RAW PASSWORD AGAINST STORED HASH
+    public boolean checkPassword(String rawPassword, String hashedPassword) {
+        return passwordEncoder.matches(rawPassword, hashedPassword);
     }
 
     // DELETE USER
@@ -43,7 +52,7 @@ public class UserService {
 
         if (updatedUser.getName() != null) existing.setName(updatedUser.getName());
         if (updatedUser.getEmail() != null) existing.setEmail(updatedUser.getEmail());
-        if (updatedUser.getPassword() != null) existing.setPassword(updatedUser.getPassword());
+        if (updatedUser.getPassword() != null) existing.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         if (updatedUser.getRole() != null) existing.setRole(updatedUser.getRole().toUpperCase());
         if (updatedUser.getAge() != null) existing.setAge(updatedUser.getAge());
         if (updatedUser.getGender() != null) existing.setGender(updatedUser.getGender());

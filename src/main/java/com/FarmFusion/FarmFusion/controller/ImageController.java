@@ -22,7 +22,8 @@ public class ImageController {
             String url = imageService.uploadImage(file);
             return ResponseEntity.ok(url);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Upload failed");
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Upload failed: " + e.getMessage());
         }
     }
 }
