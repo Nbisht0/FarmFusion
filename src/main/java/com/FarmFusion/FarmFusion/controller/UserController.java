@@ -1,6 +1,7 @@
 package com.FarmFusion.FarmFusion.controller;
 
 import com.FarmFusion.FarmFusion.Service.UserService;
+import com.FarmFusion.FarmFusion.config.JwtUtil;
 import com.FarmFusion.FarmFusion.entity.User;
 import com.FarmFusion.FarmFusion.repository.UserRepository;
 
@@ -17,46 +18,42 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserRepository userRepository, UserService userService) {
+    public UserController(UserRepository userRepository, UserService userService, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.jwtUtil = jwtUtil;
     }
 
     // -------------------- REGISTER --------------------
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
 
-        // CHECK IF EMAIL EXISTS
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(response(false, "Email already registered", null));
         }
 
-        // ROLE VALIDATION
         if (user.getRole() == null ||
                 !(user.getRole().equalsIgnoreCase("FARMER") ||
                         user.getRole().equalsIgnoreCase("CUSTOMER"))) {
             return ResponseEntity.badRequest().body(response(false, "Role must be FARMER or CUSTOMER", null));
         }
 
-        // FARMER VALIDATION
         if (user.getRole().equalsIgnoreCase("FARMER")) {
             if (user.getAadhaar() == null || user.getAddress() == null) {
                 return ResponseEntity.badRequest().body(response(false, "Farmers must provide Aadhaar and Address", null));
             }
         }
 
-        // CUSTOMER VALIDATION
         if (user.getRole().equalsIgnoreCase("CUSTOMER")) {
             if (user.getAge() == null || user.getGender() == null) {
                 return ResponseEntity.badRequest().body(response(false, "Customers must provide Age and Gender", null));
             }
         }
 
-        // NORMALIZE ROLE TO UPPERCASE
         user.setRole(user.getRole().toUpperCase());
 
-        // SAVE USER
         User saved = userService.saveUser(user);
         return ResponseEntity.ok(response(true, null, sanitize(saved)));
     }
@@ -75,7 +72,12 @@ public class UserController {
             return ResponseEntity.badRequest().body(response(false, "Invalid password", null));
         }
 
-        return ResponseEntity.ok(response(true, null, sanitize(user)));
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+
+        Map<String, Object> resp = response(true, null, sanitize(user));
+        resp.put("token", token);
+
+        return ResponseEntity.ok(resp);
     }
 
     // -------------------- GET PROFILE --------------------
@@ -102,8 +104,6 @@ public class UserController {
     }
 
     // -------------------- HELPERS --------------------
-
-    // Removes password before sending user data to frontend
     private User sanitize(User user) {
         User safe = new User();
         safe.setId(user.getId());
@@ -121,7 +121,6 @@ public class UserController {
         return safe;
     }
 
-    // Builds a consistent response map
     private Map<String, Object> response(boolean success, String message, Object data) {
         Map<String, Object> map = new HashMap<>();
         map.put("success", success);
