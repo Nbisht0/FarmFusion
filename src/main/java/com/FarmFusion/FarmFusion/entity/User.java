@@ -41,8 +41,8 @@ public class User {
     @Column(unique = true)
     private String aadhaar;
 
-    @Column(columnDefinition = "LONGTEXT")
-    private String profileImage; // Base64 image
+    @Column(length = 500)
+    private String profileImage; // Cloudinary secure URL
 
     public User() {}
 

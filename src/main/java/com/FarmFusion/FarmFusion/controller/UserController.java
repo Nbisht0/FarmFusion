@@ -103,6 +103,27 @@ public class UserController {
         }
     }
 
+    // -------------------- UPDATE PROFILE IMAGE ONLY --------------------
+    // Body: { "profileImage": "https://res.cloudinary.com/..." }
+    @PutMapping("/{id}/profile-image")
+    public ResponseEntity<?> updateProfileImage(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String imageUrl = body.get("profileImage");
+
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return ResponseEntity.badRequest().body(response(false, "profileImage URL is required", null));
+        }
+
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(response(false, "User not found", null));
+        }
+
+        user.setProfileImage(imageUrl);
+        User saved = userRepository.save(user);
+
+        return ResponseEntity.ok(response(true, null, sanitize(saved)));
+    }
+
     // -------------------- HELPERS --------------------
     private User sanitize(User user) {
         User safe = new User();
