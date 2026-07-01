@@ -4,6 +4,10 @@ import com.FarmFusion.FarmFusion.entity.Products;
 import com.FarmFusion.FarmFusion.entity.User;
 import com.FarmFusion.FarmFusion.Service.ProductService;
 import com.FarmFusion.FarmFusion.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -36,11 +40,10 @@ public class ProductController {
             @RequestParam("price") double price,
             @RequestParam("description") String description,
             @RequestParam("category") String category,
-            @RequestParam("farmerId") Long farmerId,       // ✅ farmer must send their ID
+            @RequestParam("farmerId") Long farmerId,
             @RequestParam("imageFile") MultipartFile imageFile
     ) {
         try {
-            // Fetch the farmer user
             User farmer = userRepository.findById(farmerId)
                     .orElseThrow(() -> new RuntimeException("Farmer not found with id: " + farmerId));
 
@@ -50,7 +53,7 @@ public class ProductController {
             product.setPrice(price);
             product.setDescription(description);
             product.setCategory(category);
-            product.setAddedBy(farmer);  // ✅ link product to farmer
+            product.setAddedBy(farmer);
 
             Products saved = service.addProductWithImage(product, imageFile);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -81,10 +84,15 @@ public class ProductController {
         }
     }
 
-    // ---------------- GET ALL PRODUCTS ----------------
+    // ---------------- GET ALL PRODUCTS (PAGINATED) ----------------
     @GetMapping
-    public ResponseEntity<List<Products>> getAllProducts() {
-        return ResponseEntity.ok(service.getAllProducts());
+    public ResponseEntity<Page<Products>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        Page<Products> productPage = service.getAllProducts(pageable);
+        return ResponseEntity.ok(productPage);
     }
 
     // ---------------- GET PRODUCTS BY FARMER ----------------

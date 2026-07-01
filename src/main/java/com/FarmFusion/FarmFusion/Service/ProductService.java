@@ -9,6 +9,8 @@ import com.FarmFusion.FarmFusion.repository.UserRepository;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,9 +62,14 @@ public class ProductService {
         return repo.save(product);
     }
 
-    // GET ALL PRODUCTS (for consumer browse)
+    // GET ALL PRODUCTS (for consumer browse) — kept for any other callers
     public List<Products> getAllProducts() {
         return repo.findAll();
+    }
+
+    // GET ALL PRODUCTS — PAGINATED (used by the /products endpoint now)
+    public Page<Products> getAllProducts(Pageable pageable) {
+        return repo.findAll(pageable);
     }
 
     // GET PRODUCTS BY FARMER ID (for farmer dashboard)
