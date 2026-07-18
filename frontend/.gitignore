@@ -1,0 +1,77 @@
+# ===========================
+# SPRING BOOT / MAVEN
+# ===========================
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!backend/src/main/**/target/
+!backend/src/test/**/target/
+
+# ===========================
+# SENSITIVE CONFIG - NEVER PUSH
+# ===========================
+src/main/resources/application.properties
+src/main/resources/application-prod.properties
+
+# ===========================
+# INTELLIJ IDEA
+# ===========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# ===========================
+# STS (Spring Tool Suite)
+# ===========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ===========================
+# NETBEANS
+# ===========================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!backend/src/main/**/build/
+!backend/src/test/**/build/
+
+# ===========================
+# VS CODE
+# ===========================
+.vscode/
+
+# ===========================
+# REACT / NODE
+# ===========================
+/node_modules
+/.pnp
+.pnp.js
+/coverage
+/build
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===========================
+# OS FILES
+# ===========================
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+dist/
+build/
