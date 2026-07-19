@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import jarImage from "./assets/jar.png";
 import honeyImg from "./assets/honey.png";
@@ -33,8 +33,35 @@ function App() {
   );
 }
 
+// Navbar responsive rules — !important needed because inline styles
+// on the elements below otherwise always win over CSS, media queries included.
+const navResponsiveStyles = `
+  .ff-hamburger { display: none; }
+  @media (max-width: 768px) {
+    .ff-nav-links {
+      display: none !important;
+    }
+    .ff-nav-links.ff-open {
+      display: flex !important;
+      flex-direction: column !important;
+      position: absolute !important;
+      top: 100% !important;
+      right: 1.5rem !important;
+      background: #1a3d2b !important;
+      padding: 1rem !important;
+      border-radius: 0 0 12px 12px !important;
+      margin-right: 0 !important;
+      width: 180px !important;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25) !important;
+      z-index: 20 !important;
+    }
+    .ff-hamburger { display: flex !important; }
+  }
+`;
+
 function HomePage() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Section refs for nav scrolling
   const whyChooseUsRef = useRef(null);
@@ -58,11 +85,12 @@ function HomePage() {
       <div style={{ background: "#3d9e60", position: "relative", overflow: "hidden", minHeight: "60vh", fontFamily: "Inter, sans-serif" }}>
 
         {/* Navbar */}
+        <style>{navResponsiveStyles}</style>
         <nav style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.4rem 2.5rem" }}>
           <div style={{ color: "white", fontSize: "2.2rem", fontWeight: "700" }}>
             <span style={{ fontStyle: "italic", color: "#fde68a" }}>F</span>armFusion
           </div>
-          <div style={{ display: "flex", gap: "0.6rem", marginRight: "4rem" }}>
+          <div className={`ff-nav-links${menuOpen ? " ff-open" : ""}`} style={{ display: "flex", gap: "0.6rem", marginRight: "4rem" }}>
             {["Home", "About Us", "Bestseller", "Contact"].map(item => (
               <button
                 key={item}
@@ -72,6 +100,7 @@ function HomePage() {
                   } else if (navLinks[item]) {
                     scrollToSection(navLinks[item]);
                   }
+                  setMenuOpen(false);
                 }}
                 style={{ background: "#facc15", color: "white", padding: "0.6rem 1.6rem", borderRadius: "8px", fontSize: "1rem", fontWeight: "600", border: "none", cursor: "pointer" }}
               >
@@ -79,6 +108,18 @@ function HomePage() {
               </button>
             ))}
           </div>
+
+          {/* Hamburger — hidden on desktop via .ff-hamburger CSS rule above */}
+          <button
+            className="ff-hamburger"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Toggle menu"
+            style={{ background: "transparent", border: "none", cursor: "pointer", flexDirection: "column", gap: "5px", padding: "0.5rem", marginRight: "1rem" }}
+          >
+            <span style={{ width: "24px", height: "3px", background: "white", borderRadius: "2px", display: "block" }} />
+            <span style={{ width: "24px", height: "3px", background: "white", borderRadius: "2px", display: "block" }} />
+            <span style={{ width: "24px", height: "3px", background: "white", borderRadius: "2px", display: "block" }} />
+          </button>
         </nav>
 
         {/* Glass layer */}

@@ -316,7 +316,7 @@ function ProfileModal({ user, onClose, onUserUpdate }) {
           </div>
 
           {/* ── TAB BAR ── */}
-          <div style={{ display:"flex", gap:"0.25rem", marginTop:"1.1rem", flexWrap:"wrap" }}>
+          <div className="ff-tab-bar" style={{ display:"flex", gap:"0.25rem", marginTop:"1.1rem", flexWrap:"wrap" }}>
             {TABS.map(t => (
               <button key={t.id} onClick={() => setTab(t.id)} style={{
                 padding:"0.4rem 0.85rem", borderRadius:"2rem", border:"none",
@@ -503,6 +503,42 @@ function ProfileModal({ user, onClose, onUserUpdate }) {
     </>
   );
 }
+
+// Product grid responsive rules — !important overrides the inline
+// gridTemplateColumns so exact column counts apply at each breakpoint.
+const dashboardResponsiveStyles = `
+  @media (min-width: 1025px) {
+    .ff-product-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  }
+  @media (min-width: 601px) and (max-width: 1024px) {
+    .ff-product-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+  @media (max-width: 600px) {
+    .ff-product-grid { grid-template-columns: 1fr !important; }
+  }
+
+  /* Profile modal tab bar — horizontal scroll instead of wrap on small screens */
+  @media (max-width: 600px) {
+    .ff-tab-bar {
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      scrollbar-width: none !important;
+      padding-bottom: 2px !important;
+    }
+    .ff-tab-bar::-webkit-scrollbar { display: none; }
+  }
+
+  /* Dashboard header — collapse greeting + button text so it fits on mobile */
+  @media (max-width: 600px) {
+    .ff-dashboard-header { padding: 0 0.75rem !important; }
+    .ff-header-greeting { display: none !important; }
+    .ff-header-logo-text { font-size: 1.05rem !important; }
+    .ff-header-actions { gap: 0.4rem !important; }
+    .ff-cart-btn, .ff-wishlist-btn { padding: 0.45rem 0.65rem !important; }
+    .ff-btn-text { display: none !important; }
+  }
+`;
 
 function CustomerDashboard() {
   const location = useLocation();
@@ -722,9 +758,10 @@ function CustomerDashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f0fdf4", fontFamily: "'Segoe UI', sans-serif" }}>
+      <style>{dashboardResponsiveStyles}</style>
 
       {/* ── HEADER ── */}
-      <header style={{
+      <header className="ff-dashboard-header" style={{
         background: "#1a3d2b",
         padding: "0 2rem",
         height: "64px",
@@ -738,22 +775,22 @@ function CustomerDashboard() {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <span style={{ fontSize: "1.5rem" }}>🌿</span>
-          <span style={{ color: "#facc15", fontWeight: "800", fontSize: "1.3rem", letterSpacing: "-0.5px" }}>FarmFusion</span>
+          <span className="ff-header-logo-text" style={{ color: "#facc15", fontWeight: "800", fontSize: "1.3rem", letterSpacing: "-0.5px" }}>FarmFusion</span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div className="ff-header-greeting" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <span style={{ color: "#86efac", fontSize: "0.9rem" }}>
              Hello, <strong style={{ color: "white" }}>{user.name?.split(" ")[0]}</strong>
           </span>
         </div>
 
-        <div style={{ display: "flex", gap: "0.75rem" }}>
-          <button onClick={() => setShowCart(true)} style={{
+        <div className="ff-header-actions" style={{ display: "flex", gap: "0.75rem" }}>
+          <button className="ff-cart-btn" onClick={() => setShowCart(true)} style={{
             background: "#3d9e60", color: "white", padding: "0.45rem 1rem",
             borderRadius: "2rem", border: "none", cursor: "pointer",
             fontWeight: "600", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "0.4rem"
           }}>
-            🛒 Cart
+            🛒 <span className="ff-btn-text">Cart</span>
             {cart.length > 0 && (
               <span style={{
                 background: "#facc15", color: "#1a3d2b", borderRadius: "50%",
@@ -762,11 +799,11 @@ function CustomerDashboard() {
               }}>{cart.length}</span>
             )}
           </button>
-          <button onClick={() => setShowWishlist(true)} style={{
+          <button className="ff-wishlist-btn" onClick={() => setShowWishlist(true)} style={{
             background: "#be185d", color: "white", padding: "0.45rem 1rem",
             borderRadius: "2rem", border: "none", cursor: "pointer",
             fontWeight: "600", fontSize: "0.85rem"
-          }}>❤️ Wishlist</button>
+          }}>❤️ <span className="ff-btn-text">Wishlist</span></button>
           {/* Profile Avatar + Dropdown */}
           <div style={{ position: "relative" }}>
             <button
@@ -939,7 +976,7 @@ function CustomerDashboard() {
 
         {/* Loading skeleton */}
         {loading && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.75rem" }}>
+          <div className="ff-product-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.75rem" }}>
             {[...Array(6)].map((_, i) => (
               <div key={i} style={{
                 background: "white", borderRadius: "1rem", overflow: "hidden",
@@ -970,7 +1007,7 @@ function CustomerDashboard() {
 
         {/* Product Grid */}
         {!loading && filteredProducts.length > 0 && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.75rem" }}>
+          <div className="ff-product-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.75rem" }}>
             {filteredProducts.map(product => (
               <div key={product.id} style={{
                 background: "white", borderRadius: "1rem",
