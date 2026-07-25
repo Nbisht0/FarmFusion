@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "./axiosInstance";
 import { useToast } from "./context/ToastContext";
 
-const BASE_URL = "http://localhost:8080";
+import { BASE_URL } from "./config";
 
 function Farmerdashboard() {
 const navigate = useNavigate();

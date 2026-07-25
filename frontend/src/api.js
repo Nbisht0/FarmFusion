@@ -1,3 +1,3 @@
-const BASE_URL = "http://localhost:8080";
+import { BASE_URL } from "./config";
 
 export default BASE_URL;

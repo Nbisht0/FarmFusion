@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "./axiosInstance";
 
-const BASE_URL = "http://localhost:8080";
+import { BASE_URL } from "./config";
 
 export default function AdminLogin() {
   const navigate = useNavigate();

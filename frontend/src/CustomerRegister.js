@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080";
+import { BASE_URL } from "./config";
 
 function CustomerRegister() {
   const navigate = useNavigate();
