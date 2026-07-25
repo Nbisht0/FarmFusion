@@ -13,6 +13,8 @@ import CustomerDashboard from "./CustomerDashboard";
 import FarmerLogin from "./FarmerLogin";
 import FarmerRegister from "./FarmerRegister";
 import Farmerdashboard from "./Farmerdashboard";
+import AdminLogin from "./AdminLogin";
+import AdminDashboard from "./AdminDashboard";
 import { ToastProvider } from "./context/ToastContext";
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
           <Route path="/farmer-login" element={<FarmerLogin />} />
           <Route path="/farmer-register" element={<FarmerRegister />} />
           <Route path="/farmer-dashboard" element={<Farmerdashboard />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Routes>
       </Router>
     </ToastProvider>

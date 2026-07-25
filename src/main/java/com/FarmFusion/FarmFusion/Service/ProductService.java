@@ -108,4 +108,20 @@ public class ProductService {
     public void saveProduct(Products product) {
         repo.save(product);
     }
+
+    // ---------------- SEARCH + FILTER (NEW) ----------------
+    // Combines optional name search, category filter, and price range,
+    // with sorting handled via the Pageable passed in from the controller.
+    public Page<Products> searchProducts(
+            String name,
+            String category,
+            Double minPrice,
+            Double maxPrice,
+            Pageable pageable
+    ) {
+        return repo.findAll(
+                ProductSpecification.filterBy(name, category, minPrice, maxPrice),
+                pageable
+        );
+    }
 }

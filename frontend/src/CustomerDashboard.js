@@ -565,7 +565,11 @@ function CustomerDashboard() {
   const [showCart, setShowCart] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortBy, setSortBy] = useState("id");
+  const [sortDir, setSortDir] = useState("desc");
+  const [totalElements, setTotalElements] = useState(0);
   const [addingToCart, setAddingToCart] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -588,16 +592,26 @@ function CustomerDashboard() {
 
   const PAGE_SIZE = 12;
 
-  const fetchProducts = (pageNumber) => {
+  const fetchProducts = (pageNumber, { query = debouncedQuery, category = selectedCategory, sBy = sortBy, sDir = sortDir } = {}) => {
     const isFirstLoad = pageNumber === 0;
     isFirstLoad ? setLoading(true) : setLoadingMore(true);
 
-    axiosInstance.get(`${BASE_URL}/products`, { params: { page: pageNumber, size: PAGE_SIZE } })
+    axiosInstance.get(`${BASE_URL}/products/search`, {
+      params: {
+        name: query || undefined,
+        category: category !== "All" ? category : undefined,
+        sortBy: sBy,
+        sortDir: sDir,
+        page: pageNumber,
+        size: PAGE_SIZE
+      }
+    })
       .then(res => {
         const content = res.data?.content || [];
         const isLast = res.data?.last ?? true;
         setProducts(prev => isFirstLoad ? content : [...prev, ...content]);
         setHasMore(!isLast);
+        setTotalElements(res.data?.totalElements ?? content.length);
       })
       .catch(err => { console.error(err); })
       .finally(() => {
@@ -605,14 +619,23 @@ function CustomerDashboard() {
       });
   };
 
+  // Debounce the raw search input -> debouncedQuery (waits 400ms after typing stops)
   useEffect(() => {
-    fetchProducts(0);
-  }, []);
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Re-fetch from page 0 whenever the debounced search, category, or sort changes
+  useEffect(() => {
+    setPage(0);
+    fetchProducts(0, { query: debouncedQuery, category: selectedCategory, sBy: sortBy, sDir: sortDir });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery, selectedCategory, sortBy, sortDir]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchProducts(nextPage);
+    fetchProducts(nextPage, { query: debouncedQuery, category: selectedCategory, sBy: sortBy, sDir: sortDir });
   };
 
   useEffect(() => {
@@ -739,13 +762,8 @@ function CustomerDashboard() {
     setCheckoutMsg(null);
   };
 
-  const filteredProducts = products.filter(p => {
-    const matchSearch = p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.addedBy?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchCategory = selectedCategory === "All" || p.category === selectedCategory;
-    return matchSearch && matchCategory;
-  });
+  // Filtering now happens on the backend (/products/search), so we render `products` directly.
+  const filteredProducts = products;
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
   const gst = subtotal * 0.07;
@@ -939,25 +957,47 @@ function CustomerDashboard() {
 
       </div>
 
-      {/* ── CATEGORY FILTERS ── */}
+      {/* ── CATEGORY FILTERS + SORT ── */}
       <div style={{
         background: "white", borderBottom: "1px solid #e5e7eb",
         padding: "0.75rem 2rem", display: "flex", gap: "0.5rem",
-        overflowX: "auto", scrollbarWidth: "none"
+        alignItems: "center", justifyContent: "space-between",
+        flexWrap: "wrap"
       }}>
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            style={{
-              padding: "0.4rem 1.1rem", borderRadius: "2rem", border: "none",
-              cursor: "pointer", fontWeight: "600", fontSize: "0.85rem", whiteSpace: "nowrap",
-              background: selectedCategory === cat ? "#1a3d2b" : "#f0fdf4",
-              color: selectedCategory === cat ? "white" : "#3d9e60",
-              transition: "all 0.2s"
-            }}
-          >{cat}</button>
-        ))}
+        <div style={{ display: "flex", gap: "0.5rem", overflowX: "auto", scrollbarWidth: "none" }}>
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              style={{
+                padding: "0.4rem 1.1rem", borderRadius: "2rem", border: "none",
+                cursor: "pointer", fontWeight: "600", fontSize: "0.85rem", whiteSpace: "nowrap",
+                background: selectedCategory === cat ? "#1a3d2b" : "#f0fdf4",
+                color: selectedCategory === cat ? "white" : "#3d9e60",
+                transition: "all 0.2s"
+              }}
+            >{cat}</button>
+          ))}
+        </div>
+
+        <select
+          value={`${sortBy}_${sortDir}`}
+          onChange={e => {
+            const [by, dir] = e.target.value.split("_");
+            setSortBy(by);
+            setSortDir(dir);
+          }}
+          style={{
+            padding: "0.45rem 0.9rem", borderRadius: "0.6rem",
+            border: "1.5px solid #e5e7eb", background: "#f9fafb",
+            color: "#1a3d2b", fontWeight: "600", fontSize: "0.82rem",
+            cursor: "pointer", outline: "none"
+          }}
+        >
+          <option value="id_desc">Newest First</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+        </select>
       </div>
 
       {/* ── MAIN CONTENT ── */}
@@ -966,8 +1006,8 @@ function CustomerDashboard() {
         <div style={{ marginBottom: "1rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <p style={{ color: "#4b5563", fontSize: "0.9rem", margin: 0 }}>
             {loading ? "Loading..." : (
-              <>Showing <strong>{filteredProducts.length}</strong> product{filteredProducts.length !== 1 ? "s" : ""}
-                {searchQuery && <> for "<strong>{searchQuery}</strong>"</>}
+              <>Showing <strong>{filteredProducts.length}</strong> of <strong>{totalElements}</strong> product{totalElements !== 1 ? "s" : ""}
+                {debouncedQuery && <> for "<strong>{debouncedQuery}</strong>"</>}
                 {selectedCategory !== "All" && <> in <strong>{selectedCategory}</strong></>}
               </>
             )}
@@ -998,7 +1038,7 @@ function CustomerDashboard() {
             <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>🌱</div>
             <h3 style={{ color: "#374151", marginBottom: "0.5rem" }}>No products found</h3>
             <p style={{ color: "#9ca3af" }}>Try a different search or category</p>
-            <button onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }} style={{
+            <button onClick={() => { setSearchQuery(""); setSelectedCategory("All"); setSortBy("id"); setSortDir("desc"); }} style={{
               marginTop: "1rem", background: "#3d9e60", color: "white",
               padding: "0.6rem 1.5rem", borderRadius: "2rem", border: "none", cursor: "pointer", fontWeight: "600"
             }}>Clear filters</button>
@@ -1154,7 +1194,7 @@ function CustomerDashboard() {
         )}
 
         {/* Load More */}
-        {!loading && hasMore && !searchQuery && selectedCategory === "All" && (
+        {!loading && hasMore && (
           <div style={{ textAlign: "center", marginTop: "2rem" }}>
             <button
               onClick={handleLoadMore}

@@ -23,7 +23,10 @@ public class User {
     private String password;
 
     @Column(nullable = false)
-    private String role;  // FARMER or CUSTOMER
+    private String role;  // FARMER or CUSTOMER or ADMIN
+
+    @Column(nullable = false)
+    private String status = "ACTIVE"; // ACTIVE or BLOCKED (used by admin to approve/block farmers)
 
     // CUSTOMER FIELDS
     private Integer age;
@@ -61,6 +64,9 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public Integer getAge() { return age; }
     public void setAge(Integer age) { this.age = age; }

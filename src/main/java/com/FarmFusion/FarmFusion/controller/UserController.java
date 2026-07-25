@@ -72,6 +72,10 @@ public class UserController {
             return ResponseEntity.badRequest().body(response(false, "Invalid password", null));
         }
 
+        if ("BLOCKED".equalsIgnoreCase(user.getStatus())) {
+            return ResponseEntity.status(403).body(response(false, "Your account has been blocked by admin. Please contact support.", null));
+        }
+
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         Map<String, Object> resp = response(true, null, sanitize(user));
@@ -131,6 +135,7 @@ public class UserController {
         safe.setName(user.getName());
         safe.setEmail(user.getEmail());
         safe.setRole(user.getRole());
+        safe.setStatus(user.getStatus());
         safe.setPhone(user.getPhone());
         safe.setAge(user.getAge());
         safe.setGender(user.getGender());

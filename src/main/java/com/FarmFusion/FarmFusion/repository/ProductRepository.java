@@ -2,12 +2,13 @@ package com.FarmFusion.FarmFusion.repository;
 
 import com.FarmFusion.FarmFusion.entity.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Products, Long> {
+public interface ProductRepository extends JpaRepository<Products, Long>, JpaSpecificationExecutor<Products> {
 
     // Get all products by a specific farmer
     List<Products> findByAddedById(Long farmerId);

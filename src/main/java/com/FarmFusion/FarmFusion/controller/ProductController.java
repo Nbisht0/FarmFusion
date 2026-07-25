@@ -95,6 +95,33 @@ public class ProductController {
         return ResponseEntity.ok(productPage);
     }
 
+    // ---------------- SEARCH + FILTER PRODUCTS (NEW) ----------------
+    // Example calls:
+    //   /products/search?name=wheat
+    //   /products/search?category=Vegetables
+    //   /products/search?minPrice=50&maxPrice=200
+    //   /products/search?name=rice&category=Grains&minPrice=100&sortBy=price&sortDir=asc&page=0&size=12
+    @GetMapping("/search")
+    public ResponseEntity<Page<Products>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Products> result = service.searchProducts(name, category, minPrice, maxPrice, pageable);
+        return ResponseEntity.ok(result);
+    }
+
     // ---------------- GET PRODUCTS BY FARMER ----------------
     @GetMapping("/farmer/{farmerId}")
     public ResponseEntity<List<Products>> getProductsByFarmer(@PathVariable Long farmerId) {

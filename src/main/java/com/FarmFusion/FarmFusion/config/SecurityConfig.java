@@ -35,7 +35,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ← preflight fix
                         .requestMatchers("/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // ← products public
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll() // ← products public (fixed path)
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // ← admin-only endpoints
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())
