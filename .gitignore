@@ -10,7 +10,7 @@ target/
 # ===========================
 # SENSITIVE CONFIG - NEVER PUSH
 # ===========================
-src/main/resources/application.properties
+
 src/main/resources/application-prod.properties
 
 # ===========================
