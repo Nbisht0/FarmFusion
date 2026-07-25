@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "./axiosInstance";
 import { useToast } from "./context/ToastContext";
 
-import { BASE_URL } from "./config";
+import { BASE_URL } from "./Config";
 
 function Farmerdashboard() {
 const navigate = useNavigate();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "./axiosInstance";
 
-import { BASE_URL } from "./config";
+import { BASE_URL } from "./Config";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();

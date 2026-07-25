@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import { BASE_URL } from "./config";
+import { BASE_URL } from "./Config";
 
 function CustomerLogin() {
   const navigate = useNavigate();
