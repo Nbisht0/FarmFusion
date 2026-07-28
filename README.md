@@ -1,70 +1,147 @@
-# Getting Started with Create React App
+<div align="center">
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# 🌾 FarmFusion
 
-## Available Scripts
+### Connecting Farmers Directly to Customers — A Full-Stack Agricultural E-Commerce Platform
 
-In the project directory, you can run:
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20Site-3d9e60?style=for-the-badge)](https://farm-fusion-khaki.vercel.app)
+[![Backend](https://img.shields.io/badge/Backend-Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://farmfusion-production.up.railway.app)
+[![Frontend](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://farm-fusion-khaki.vercel.app)
 
-### `npm start`
+</div>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📖 About the Project
 
-### `npm test`
+**FarmFusion** is a full-stack e-commerce platform built to eliminate middlemen in agricultural trade — letting farmers list and sell their produce directly to customers. The platform supports **three distinct user roles** (Customer, Farmer, Admin), each with tailored dashboards and permissions, backed by secure JWT authentication and role-based access control (RBAC).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This isn't a tutorial clone — every feature below (search, wishlist, cart, admin RBAC, image handling, deployment) was built and debugged from scratch, including real production issues like CORS configuration, environment-variable secret management, and cross-platform case-sensitivity bugs.
 
-### `npm run build`
+🔗 **[Live Demo →](https://farm-fusion-khaki.vercel.app)**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ✨ Features
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 👤 Customer
+- Browse products with **dynamic search & filter** (name, category, price range) using JPA Specifications
+- Sort products (price, newest, etc.) with paginated **"Load More"** browsing
+- Add products to **Wishlist** and **Cart**
+- Secure signup/login with JWT-based authentication
+- Place orders and view order history
 
-### `npm run eject`
+### 🌱 Farmer
+- Register and manage a personal product catalog
+- Upload product images (stored via **Cloudinary**, not bloating the database)
+- View and manage orders for their listed products
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 🛡️ Admin
+- Dedicated **Admin Dashboard** (protected via Spring Security RBAC — not just hidden in the UI)
+- Manage farmer accounts (activate/block)
+- Monitor products across the platform
+- View orders & revenue overview
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### ⚙️ Platform-wide
+- **JWT authentication** with BCrypt password hashing
+- **Role-Based Access Control** enforced at the backend (`/api/admin/**` is genuinely protected, not just hidden)
+- Custom **Toast notification system** built with React Context API (no external library)
+- Fully **responsive design** — mobile hamburger nav, responsive product grid
+- Deployed to production with environment-based secrets (no hardcoded credentials)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🛠️ Tech Stack
 
-## Learn More
+| Layer | Technology |
+|---|---|
+| **Frontend** | React, Axios, React Router, Context API |
+| **Backend** | Java, Spring Boot, Spring Security, Spring Data JPA (Hibernate) |
+| **Database** | MySQL |
+| **Auth** | JWT (JSON Web Tokens), BCrypt |
+| **Media Storage** | Cloudinary |
+| **Deployment** | Railway (Backend + MySQL), Vercel (Frontend) |
+| **Version Control** | Git & GitHub |
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🏗️ Architecture
 
-### Code Splitting
+```
+┌─────────────────────┐         HTTPS + JWT          ┌──────────────────────────┐
+│   React Frontend     │ ────────────────────────────▶│   Spring Boot Backend    │
+│   (Vercel)            │◀──────────────────────────── │   (Railway)              │
+└─────────────────────┘                                └───────────┬──────────────┘
+                                                                     │
+                                                          Spring Data JPA
+                                                                     │
+                                                                     ▼
+                                                        ┌──────────────────────────┐
+                                                        │      MySQL Database      │
+                                                        │        (Railway)         │
+                                                        └──────────────────────────┘
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+                            ┌──────────────────────────┐
+                            │        Cloudinary         │ ◀── Product & profile images
+                            └──────────────────────────┘
+```
 
-### Analyzing the Bundle Size
+- **Stateless authentication** — no server-side sessions; every request is authorized via a JWT sent in the `Authorization` header.
+- **CORS** explicitly configured to allow the deployed frontend origin to call the backend API.
+- **RBAC enforced server-side** — role checks happen in Spring Security's filter chain, not just in the frontend UI.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 🚀 Getting Started (Local Setup)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Prerequisites
+- Java 17+
+- Node.js & npm
+- MySQL running locally
 
-### Advanced Configuration
+### Backend
+```bash
+cd FarmFusion
+# Set your local DB credentials as environment variables, or in application.properties
+mvn spring-boot:run
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Frontend
+```bash
+cd frontend
+npm install
+npm start
+```
 
-### Deployment
+The app expects the backend URL in `frontend/.env`:
+```
+REACT_APP_API_URL=http://localhost:8080
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## 📦 Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+| Service | Platform |
+|---|---|
+| Backend API | [Railway](https://railway.app) |
+| Database | Railway (Managed MySQL) |
+| Frontend | [Vercel](https://vercel.com) |
+
+Secrets (DB credentials, JWT secret, Cloudinary keys) are injected via environment variables on each platform — never committed to source control.
+
+---
+
+## 🔗 Links
+
+- 🌐 **Live Site:** [farm-fusion-khaki.vercel.app](https://farm-fusion-khaki.vercel.app)
+- 🔌 **Backend API:** [farmfusion-production.up.railway.app](https://farmfusion-production.up.railway.app)
+- 💻 **Author:** [Nbisht0](https://github.com/Nbisht0)
+
+---
+
+<div align="center">
+
+Made with 🌱 by Nidhi
+
+</div>
