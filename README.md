@@ -14,9 +14,9 @@
 
 ## 📖 About the Project
 
-**FarmFusion** is a full-stack e-commerce platform built to eliminate middlemen in agricultural trade — letting farmers list and sell their produce directly to customers. The platform supports **three distinct user roles** (Customer, Farmer, Admin), each with tailored dashboards and permissions, backed by secure JWT authentication and role-based access control (RBAC).
+**FarmFusion** is a full-stack e-commerce platform built to eliminate middlemen in agricultural trade, letting farmers list and sell their produce directly to customers. The platform supports **three distinct user roles** (Customer, Farmer, Admin), each with tailored dashboards and permissions, backed by secure JWT authentication and role-based access control (RBAC).
 
-This isn't a tutorial clone — every feature below (search, wishlist, cart, admin RBAC, image handling, deployment) was built and debugged from scratch, including real production issues like CORS configuration, environment-variable secret management, and cross-platform case-sensitivity bugs.
+This isn't a tutorial clone, every feature below (search, wishlist, cart, admin RBAC, image handling, deployment) was built and debugged from scratch, including real production issues like CORS configuration, environment-variable secret management, and cross-platform case-sensitivity bugs.
 
 🔗 **[Live Demo →](https://farm-fusion-khaki.vercel.app)**
 
